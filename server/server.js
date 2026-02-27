@@ -11,9 +11,14 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// CORS origins — configurable via env
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(s => s.trim())
+  : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -25,7 +30,7 @@ app.use('/api/auth', authRoutes);
 // Socket.io Setup
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });

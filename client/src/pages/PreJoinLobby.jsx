@@ -62,7 +62,7 @@ export default function PreJoinLobby() {
 
     // ─── Socket connection for lobby ───
     useEffect(() => {
-        const socket = io('http://localhost:5001', { forceNew: true });
+        const socket = io(import.meta.env.VITE_SERVER_URL || 'http://localhost:5001', { forceNew: true });
         socketRef.current = socket;
 
         socket.on('connect', () => {

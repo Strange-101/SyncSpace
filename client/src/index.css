@@ -1,10 +1,19 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode (Tailwind v4) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Allow normal app styles */
 @layer base {
   body {
     @apply antialiased text-slate-900 bg-slate-50 overflow-x-hidden m-0 p-0;
   }
+}
+
+/* Dark mode body override */
+html.dark body {
+  background-color: #0a0a0f;
+  color: #e2e8f0;
 }
 
 /* Force Excalidraw Container to not inherit Tailwind's SVG resets by unsetting SVG width defaults */

@@ -63,23 +63,23 @@ export default function Workspace() {
     };
 
     return (
-        <div className="flex w-screen h-screen overflow-hidden bg-[#fdfdfd] font-sans selection:bg-yellow-200">
-            {/* Top Navigation Bar — Sketchy Style */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-white border-b-2 border-black flex items-center justify-between px-5 z-40 shadow-[0_4px_0px_0px_rgba(0,0,0,1)] pointer-events-auto">
+        <div className="flex w-screen h-screen overflow-hidden bg-[#fdfdfd] dark:bg-[#0a0a0f] font-sans selection:bg-yellow-200 dark:selection:bg-yellow-800 transition-colors">
+            {/* Top Navigation Bar */}
+            <div className="absolute top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b-2 border-black dark:border-gray-700 flex items-center justify-between px-5 z-40 shadow-[0_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[0_4px_0px_0px_rgba(55,65,81,1)] pointer-events-auto transition-colors">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleLeave}
-                        className="p-2 bg-red-100 border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-black"
+                        className="p-2 bg-red-100 dark:bg-red-900/50 border-2 border-black dark:border-gray-600 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all text-black dark:text-white"
                     >
                         <ArrowLeft size={18} strokeWidth={2.5} />
                     </button>
                     <div className="flex items-center gap-2">
-                        <div className="bg-yellow-300 border-2 border-black p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-3">
+                        <div className="bg-yellow-300 dark:bg-yellow-500 border-2 border-black dark:border-gray-700 p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-3">
                             <Pencil size={16} strokeWidth={2.5} color="black" />
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-sm font-extrabold text-black tracking-tight">SyncSpace</h1>
-                            <span className="text-[10px] text-gray-700 font-bold font-mono">
+                            <h1 className="text-sm font-extrabold text-black dark:text-white tracking-tight">SyncSpace</h1>
+                            <span className="text-[10px] text-gray-700 dark:text-gray-400 font-bold font-mono">
                                 Room: {roomId.slice(0, 8)}...
                             </span>
                         </div>
@@ -89,13 +89,13 @@ export default function Workspace() {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={copyRoomId}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-purple-200 border-2 border-black text-black text-sm font-bold rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all rotate-1"
+                        className="flex items-center gap-2 px-3 py-1.5 bg-purple-200 dark:bg-purple-800 border-2 border-black dark:border-gray-600 text-black dark:text-white text-sm font-bold rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all rotate-1"
                     >
                         {copied ? <CheckCircle2 size={16} strokeWidth={2.5} /> : <Copy size={16} strokeWidth={2.5} />}
                         {copied ? 'Copied!' : 'Copy Link'}
                     </button>
                     <div
-                        className="flex items-center justify-center bg-blue-300 text-black px-3 py-1.5 rounded-lg border-2 border-black text-sm font-bold gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:bg-blue-400 transition-colors -rotate-1"
+                        className="flex items-center justify-center bg-blue-300 dark:bg-blue-800 text-black dark:text-white px-3 py-1.5 rounded-lg border-2 border-black dark:border-gray-600 text-sm font-bold gap-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:bg-blue-400 dark:hover:bg-blue-700 transition-colors -rotate-1"
                         onClick={() => toggleSidebar('participants')}
                     >
                         <Users size={16} strokeWidth={2.5} />
@@ -110,7 +110,7 @@ export default function Workspace() {
             </div>
 
             {/* Video Grid Layer - Adapts based on viewMode */}
-            <div className={`absolute inset-0 pt-[68px] pb-28 px-4 transition-all duration-500 z-20 pointer-events-none flex ${viewMode === 'gallery' ? 'items-center justify-center bg-[#fdfdfd]' : ''} ${isSidebarOpen ? 'pr-84' : ''}`}>
+            <div className={`absolute inset-0 pt-[68px] pb-28 px-4 transition-all duration-500 z-20 pointer-events-none flex ${viewMode === 'gallery' ? 'items-center justify-center bg-[#fdfdfd] dark:bg-[#0a0a0f]' : ''} ${isSidebarOpen ? 'pr-84' : ''}`}>
                 <VideoGrid
                     userVideo={userVideo}
                     peers={peers}
@@ -154,20 +154,20 @@ export default function Workspace() {
             {joinRequests.length > 0 && (
                 <div className="fixed top-20 right-5 z-50 space-y-3 max-w-sm">
                     {joinRequests.map((req) => (
-                        <div key={req.socketId} className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 animate-in slide-in-from-right">
-                            <p className="font-extrabold text-black text-sm mb-3 flex items-center gap-2">
-                                <Bell size={16} strokeWidth={2.5} className="inline" /> <span className="text-blue-600">{req.userName}</span> wants to join
+                        <div key={req.socketId} className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] p-4 animate-in slide-in-from-right">
+                            <p className="font-extrabold text-black dark:text-white text-sm mb-3 flex items-center gap-2">
+                                <Bell size={16} strokeWidth={2.5} className="inline" /> <span className="text-blue-600 dark:text-blue-400">{req.userName}</span> wants to join
                             </p>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => admitUser(req.socketId)}
-                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all"
+                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-300 dark:bg-green-700 border-2 border-black dark:border-gray-600 rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black dark:text-white"
                                 >
                                     <UserCheck size={14} strokeWidth={2.5} /> Admit
                                 </button>
                                 <button
                                     onClick={() => denyUser(req.socketId)}
-                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-red-200 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all"
+                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-red-200 dark:bg-red-900 border-2 border-black dark:border-gray-600 rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black dark:text-white"
                                 >
                                     <UserX size={14} strokeWidth={2.5} /> Deny
                                 </button>

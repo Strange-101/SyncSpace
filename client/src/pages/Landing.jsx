@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useGoogleLogin } from '@react-oauth/google';
 import {
     Pencil, LogIn, UserPlus, Mail, Lock, User, ChevronRight,
     Zap, MessageSquare, Brush, Monitor, Save, Crown,
@@ -9,12 +10,12 @@ import {
 } from 'lucide-react';
 
 const features = [
-    { title: "Real-time Sync", description: "Draw simultaneously with multiple users using WebSockets.", icon: <Zap size={28} strokeWidth={2} />, color: "bg-yellow-200" },
-    { title: "In-Room Chat", description: "Communicate seamlessly with your team using built-in chat.", icon: <MessageSquare size={28} strokeWidth={2} />, color: "bg-green-200" },
-    { title: "Canvas Tools", description: "Pencil, eraser, color picker, brush size, and more.", icon: <Brush size={28} strokeWidth={2} />, color: "bg-pink-200" },
-    { title: "Screen Sharing", description: "Share your screen in real-time with WebRTC.", icon: <Monitor size={28} strokeWidth={2} />, color: "bg-purple-200" },
-    { title: "Saved Sessions", description: "Your recent boards are saved for quick re-access.", icon: <Save size={28} strokeWidth={2} />, color: "bg-blue-200" },
-    { title: "Host Controls", description: "Manage rooms with role-based permissions.", icon: <Crown size={28} strokeWidth={2} />, color: "bg-orange-200" }
+    { title: "Real-time Sync", description: "Draw simultaneously with multiple users using WebSockets.", icon: <Zap size={28} strokeWidth={2} />, color: "bg-yellow-200 dark:bg-yellow-900/50" },
+    { title: "In-Room Chat", description: "Communicate seamlessly with your team using built-in chat.", icon: <MessageSquare size={28} strokeWidth={2} />, color: "bg-green-200 dark:bg-green-900/50" },
+    { title: "Canvas Tools", description: "Pencil, eraser, color picker, brush size, and more.", icon: <Brush size={28} strokeWidth={2} />, color: "bg-pink-200 dark:bg-pink-900/50" },
+    { title: "Screen Sharing", description: "Share your screen in real-time with WebRTC.", icon: <Monitor size={28} strokeWidth={2} />, color: "bg-purple-200 dark:bg-purple-900/50" },
+    { title: "Saved Sessions", description: "Your recent boards are saved for quick re-access.", icon: <Save size={28} strokeWidth={2} />, color: "bg-blue-200 dark:bg-blue-900/50" },
+    { title: "Host Controls", description: "Manage rooms with role-based permissions.", icon: <Crown size={28} strokeWidth={2} />, color: "bg-orange-200 dark:bg-orange-900/50" }
 ];
 
 const rotations = ['rotate-1', '-rotate-1', 'rotate-[0.5deg]', '-rotate-[0.5deg]', 'rotate-0'];
@@ -27,8 +28,24 @@ export default function Landing() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { login, register } = useAuth();
+    const { login, register, googleLogin } = useAuth();
     const navigate = useNavigate();
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                setError('');
+                setIsLoading(true);
+                await googleLogin(tokenResponse.access_token);
+                navigate('/dashboard');
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        onError: () => setError('Google sign-in failed'),
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -69,37 +86,37 @@ export default function Landing() {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdfdfd] font-sans selection:bg-yellow-200 overflow-auto">
+        <div className="min-h-screen bg-[#fdfdfd] dark:bg-[#0a0a0f] font-sans selection:bg-yellow-200 dark:selection:bg-yellow-800 overflow-auto transition-colors">
 
             {/* ─── Scattered Background Doodles ─── */}
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div className="absolute top-16 left-8 -rotate-12 opacity-[0.06]"><Pencil size={64} strokeWidth={1.5} /></div>
-                <div className="absolute top-40 right-12 rotate-12 opacity-[0.06]"><MessageSquare size={52} strokeWidth={1.5} /></div>
-                <div className="absolute bottom-32 left-16 rotate-45 opacity-[0.06]"><Zap size={52} strokeWidth={1.5} /></div>
-                <div className="absolute bottom-20 right-28 -rotate-6 opacity-[0.06]"><Palette size={64} strokeWidth={1.5} /></div>
-                <div className="absolute top-1/2 left-1/4 rotate-12 opacity-[0.04]"><Star size={44} strokeWidth={1.5} /></div>
-                <div className="absolute top-28 right-1/3 -rotate-45 opacity-[0.05]"><Rocket size={52} strokeWidth={1.5} /></div>
+                <div className="absolute top-16 left-8 -rotate-12 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><Pencil size={64} strokeWidth={1.5} /></div>
+                <div className="absolute top-40 right-12 rotate-12 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><MessageSquare size={52} strokeWidth={1.5} /></div>
+                <div className="absolute bottom-32 left-16 rotate-45 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><Zap size={52} strokeWidth={1.5} /></div>
+                <div className="absolute bottom-20 right-28 -rotate-6 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><Palette size={64} strokeWidth={1.5} /></div>
+                <div className="absolute top-1/2 left-1/4 rotate-12 opacity-[0.04] dark:opacity-[0.1] dark:text-white"><Star size={44} strokeWidth={1.5} /></div>
+                <div className="absolute top-28 right-1/3 -rotate-45 opacity-[0.05] dark:opacity-[0.12] dark:text-white"><Rocket size={52} strokeWidth={1.5} /></div>
             </div>
 
             {/* ─── Sticky Nav Bar ─── */}
-            <nav className="sticky top-0 z-50 bg-white border-b-2 border-black shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
+            <nav className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b-2 border-black dark:border-gray-700 shadow-[0_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[0_4px_0px_0px_rgba(55,65,81,1)] transition-colors">
                 <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                        <div className="bg-yellow-300 border-2 border-black p-2 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-3 hover:rotate-0 transition-transform">
+                        <div className="bg-yellow-300 dark:bg-yellow-500 border-2 border-black dark:border-gray-700 p-2 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-3 hover:rotate-0 transition-transform">
                             <Pencil size={22} strokeWidth={2.5} color="black" />
                         </div>
-                        <span className="text-2xl font-extrabold tracking-tight text-black">SyncSpace</span>
+                        <span className="text-2xl font-extrabold tracking-tight text-black dark:text-white">SyncSpace</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => { setAuthMode('login'); document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                            className="px-5 py-2 font-bold text-black hover:underline decoration-2 underline-offset-4 hidden sm:block"
+                            className="px-5 py-2 font-bold text-black dark:text-white hover:underline decoration-2 underline-offset-4 hidden sm:block"
                         >
                             Login
                         </button>
                         <button
                             onClick={() => { setAuthMode('signup'); document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                            className="px-5 py-2 border-2 border-black rounded-xl bg-purple-300 font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-black"
+                            className="px-5 py-2 border-2 border-black dark:border-gray-600 rounded-xl bg-purple-300 dark:bg-purple-700 font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-black dark:text-white"
                         >
                             Sign Up Free
                         </button>
@@ -117,7 +134,7 @@ export default function Landing() {
 
                         {/* Left — Hero Text */}
                         <div className="flex flex-col gap-6">
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] text-black tracking-tight">
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] text-black dark:text-white tracking-tight">
                                 Sketch, Chat & Share in{' '}
                                 <span className="relative inline-block">
                                     Real-Time
@@ -126,7 +143,7 @@ export default function Landing() {
                                     </svg>
                                 </span>
                             </h1>
-                            <p className="text-xl text-gray-700 font-medium max-w-lg leading-relaxed">
+                            <p className="text-xl text-gray-700 dark:text-gray-400 font-medium max-w-lg leading-relaxed">
                                 Your ultimate collaborative workspace. Draw together, chat instantly, and share your screen — all in one infinite canvas.
                             </p>
 
@@ -140,7 +157,7 @@ export default function Landing() {
                                 ].map((f, i) => (
                                     <span
                                         key={i}
-                                        className="bg-white border-2 border-black rounded-lg px-3 py-1.5 text-sm font-bold text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                                        className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-bold text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                                         style={{ transform: `rotate(${(i % 2 === 0 ? -1 : 1) * (0.5 + i * 0.3)}deg)` }}
                                     >
                                         <span className="flex items-center gap-1.5">{f.icon} {f.label}</span>
@@ -151,25 +168,25 @@ export default function Landing() {
 
                         {/* Right — Auth Card */}
                         <div id="auth-section" className="flex justify-center lg:justify-end">
-                            <div className={`w-full max-w-md bg-white border-2 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-7 relative flex flex-col items-center ${authMode === 'login' ? '-rotate-1' : 'rotate-1'} hover:rotate-0 transition-transform duration-300`}>
+                            <div className={`w-full max-w-md bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(55,65,81,1)] p-7 relative flex flex-col items-center ${authMode === 'login' ? '-rotate-1' : 'rotate-1'} hover:rotate-0 transition-transform duration-300`}>
                                 {/* Icon Header */}
-                                <div className={`${authMode === 'login' ? 'bg-blue-300' : 'bg-green-300'} border-2 border-black p-3.5 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${authMode === 'login' ? 'rotate-6' : '-rotate-6'} mb-5 hover:rotate-0 transition-transform`}>
+                                <div className={`${authMode === 'login' ? 'bg-blue-300 dark:bg-blue-700' : 'bg-green-300 dark:bg-green-700'} border-2 border-black dark:border-gray-600 p-3.5 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${authMode === 'login' ? 'rotate-6' : '-rotate-6'} mb-5 hover:rotate-0 transition-transform`}>
                                     {authMode === 'login'
                                         ? <LogIn size={28} strokeWidth={2.5} color="black" />
                                         : <UserPlus size={28} strokeWidth={2.5} color="black" />
                                     }
                                 </div>
 
-                                <h2 className="text-2xl font-extrabold text-center text-black mb-1 tracking-tight">
+                                <h2 className="text-2xl font-extrabold text-center text-black dark:text-white mb-1 tracking-tight">
                                     {authMode === 'login' ? 'Welcome Back!' : 'Join SyncSpace!'}
                                 </h2>
-                                <p className="text-gray-600 text-sm text-center mb-5 font-medium">
+                                <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-5 font-medium">
                                     {authMode === 'login' ? 'Log in to your account' : 'Create a free account to start'}
                                 </p>
 
                                 {/* Error */}
                                 {error && (
-                                    <div className="w-full bg-red-100 border-2 border-red-400 rounded-xl px-4 py-2.5 mb-4 text-red-800 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(220,38,38,0.5)] -rotate-[0.5deg]">
+                                    <div className="w-full bg-red-100 dark:bg-red-900/50 border-2 border-red-400 dark:border-red-600 rounded-xl px-4 py-2.5 mb-4 text-red-800 dark:text-red-200 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(220,38,38,0.5)] -rotate-[0.5deg]">
                                         <AlertTriangle size={16} strokeWidth={2.5} className="inline mr-1" /> {error}
                                     </div>
                                 )}
@@ -184,7 +201,7 @@ export default function Landing() {
                                                 placeholder="Full name"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
-                                                className="w-full bg-white border-2 border-black rounded-xl pl-11 pr-4 py-3.5 text-black font-medium placeholder-gray-400 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 transition-all"
+                                                className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-gray-600 rounded-xl pl-11 pr-4 py-3.5 text-black dark:text-white font-medium placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 transition-all"
                                                 required
                                             />
                                         </div>
@@ -225,7 +242,7 @@ export default function Landing() {
                                                 placeholder="Confirm password"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="w-full bg-white border-2 border-black rounded-xl pl-11 pr-4 py-3.5 text-black font-medium placeholder-gray-400 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 transition-all"
+                                                className="w-full bg-white dark:bg-gray-900 border-2 border-black dark:border-gray-600 rounded-xl pl-11 pr-4 py-3.5 text-black dark:text-white font-medium placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-1 transition-all"
                                                 required
                                             />
                                         </div>
@@ -235,7 +252,7 @@ export default function Landing() {
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className={`w-full ${authMode === 'login' ? 'bg-blue-400 hover:bg-blue-500' : 'bg-green-300 hover:bg-green-400'} text-black font-bold text-lg py-3.5 px-6 border-2 border-black rounded-xl flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-60 disabled:pointer-events-none`}
+                                        className={`w-full ${authMode === 'login' ? 'bg-blue-400 dark:bg-blue-600 hover:bg-blue-500' : 'bg-green-300 dark:bg-green-700 hover:bg-green-400'} text-black dark:text-white font-bold text-lg py-3.5 px-6 border-2 border-black dark:border-gray-600 rounded-xl flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-60 disabled:pointer-events-none`}
                                     >
                                         {isLoading
                                             ? <><Loader2 size={18} className="animate-spin" /> {authMode === 'login' ? 'Logging in...' : 'Creating account...'}</>
@@ -244,19 +261,37 @@ export default function Landing() {
                                     </button>
                                 </form>
 
+                                {/* Google Divider */}
+                                <div className="w-full relative flex items-center py-3 my-1">
+                                    <div className="flex-grow border-t-2 border-black dark:border-gray-600 border-dashed"></div>
+                                    <span className="flex-shrink-0 mx-3 text-black dark:text-white font-bold px-3 py-1 bg-orange-200 dark:bg-orange-800/60 border-2 border-black dark:border-gray-600 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rotate-1 text-sm">or</span>
+                                    <div className="flex-grow border-t-2 border-black dark:border-gray-600 border-dashed"></div>
+                                </div>
+
+                                {/* Google Sign-In Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleGoogleLogin()}
+                                    disabled={isLoading}
+                                    className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-black dark:text-white font-bold text-base py-3.5 px-6 border-2 border-black dark:border-gray-600 rounded-xl flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all disabled:opacity-60 disabled:pointer-events-none -rotate-[0.5deg]"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+                                    {authMode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
+                                </button>
+
                                 {/* Dashed Divider */}
-                                <div className="w-full relative flex items-center py-4 my-1">
-                                    <div className="flex-grow border-t-2 border-black border-dashed"></div>
-                                    <span className={`flex-shrink-0 mx-3 text-black font-bold px-3 py-1 ${authMode === 'login' ? 'bg-yellow-200' : 'bg-blue-200'} border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${authMode === 'login' ? '-rotate-2' : 'rotate-2'} text-sm`}>
+                                <div className="w-full relative flex items-center py-3 my-1">
+                                    <div className="flex-grow border-t-2 border-black dark:border-gray-600 border-dashed"></div>
+                                    <span className={`flex-shrink-0 mx-3 text-black dark:text-white font-bold px-3 py-1 ${authMode === 'login' ? 'bg-yellow-200 dark:bg-yellow-800/60' : 'bg-blue-200 dark:bg-blue-800/60'} border-2 border-black dark:border-gray-600 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${authMode === 'login' ? '-rotate-2' : 'rotate-2'} text-sm`}>
                                         {authMode === 'login' ? 'New here?' : 'Have an account?'}
                                     </span>
-                                    <div className="flex-grow border-t-2 border-black border-dashed"></div>
+                                    <div className="flex-grow border-t-2 border-black dark:border-gray-600 border-dashed"></div>
                                 </div>
 
                                 {/* Switch Auth Mode */}
                                 <button
                                     onClick={switchMode}
-                                    className={`w-full ${authMode === 'login' ? 'bg-green-300 hover:bg-green-400' : 'bg-blue-400 hover:bg-blue-500'} text-black font-bold text-base py-3.5 px-6 border-2 border-black rounded-xl flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all ${authMode === 'login' ? 'rotate-[0.5deg]' : '-rotate-[0.5deg]'}`}
+                                    className={`w-full ${authMode === 'login' ? 'bg-green-300 dark:bg-green-700 hover:bg-green-400' : 'bg-blue-400 dark:bg-blue-600 hover:bg-blue-500'} text-black dark:text-white font-bold text-base py-3.5 px-6 border-2 border-black dark:border-gray-600 rounded-xl flex items-center justify-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all ${authMode === 'login' ? 'rotate-[0.5deg]' : '-rotate-[0.5deg]'}`}
                                 >
                                     {authMode === 'login' ? <><PenLine size={16} strokeWidth={2.5} /> Create an Account</> : <><KeyRound size={16} strokeWidth={2.5} /> Log In Instead</>}
                                 </button>
@@ -268,14 +303,14 @@ export default function Landing() {
                 {/* ═══════════════════════════════════ */}
                 {/* ─── FEATURES SECTION ─── */}
                 {/* ═══════════════════════════════════ */}
-                <section className="bg-white border-y-2 border-black py-20">
+                <section className="bg-white dark:bg-gray-900 border-y-2 border-black dark:border-gray-700 py-20 transition-colors">
                     <div className="max-w-7xl mx-auto px-6">
                         {/* Section Header */}
                         <div className="text-center mb-14">
-                            <span className="inline-block bg-yellow-200 border-2 border-black rounded-xl px-5 py-2 font-extrabold text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1 mb-4">
+                            <span className="inline-block bg-yellow-200 dark:bg-yellow-800/60 border-2 border-black dark:border-gray-600 rounded-xl px-5 py-2 font-extrabold text-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-1 mb-4 text-black dark:text-white">
                                 <Wrench size={18} strokeWidth={2.5} className="inline mr-1" /> Features
                             </span>
-                            <h2 className="text-4xl md:text-5xl font-extrabold text-black tracking-tight">
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-black dark:text-white tracking-tight">
                                 Everything you need,{' '}
                                 <span className="relative inline-block">
                                     built in
@@ -291,11 +326,11 @@ export default function Landing() {
                             {features.map((feat, i) => (
                                 <div
                                     key={i}
-                                    className={`${feat.color} p-6 border-2 border-black rounded-2xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-3 ${rotations[i % rotations.length]}`}
+                                    className={`${feat.color} p-6 border-2 border-black dark:border-gray-600 rounded-2xl shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[5px_5px_0px_0px_rgba(55,65,81,1)] transition-all hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-3 ${rotations[i % rotations.length]}`}
                                 >
-                                    <div className="text-4xl">{feat.icon}</div>
-                                    <h3 className="text-xl font-extrabold text-black tracking-tight">{feat.title}</h3>
-                                    <p className="text-gray-800 font-medium leading-relaxed text-sm">{feat.description}</p>
+                                    <div className="text-4xl text-black dark:text-white">{feat.icon}</div>
+                                    <h3 className="text-xl font-extrabold text-black dark:text-white tracking-tight">{feat.title}</h3>
+                                    <p className="text-gray-800 dark:text-gray-300 font-medium leading-relaxed text-sm">{feat.description}</p>
                                 </div>
                             ))}
                         </div>
@@ -306,16 +341,16 @@ export default function Landing() {
                 {/* ─── CTA SECTION ─── */}
                 {/* ═══════════════════════════════════ */}
                 <section className="max-w-7xl mx-auto px-6 py-20 text-center">
-                    <div className="bg-blue-100 border-2 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-12 rotate-[0.3deg] hover:rotate-0 transition-transform">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-black mb-4 tracking-tight">
+                    <div className="bg-blue-100 dark:bg-blue-900/40 border-2 border-black dark:border-gray-600 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(55,65,81,1)] p-12 rotate-[0.3deg] hover:rotate-0 transition-transform">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-black dark:text-white mb-4 tracking-tight">
                             Ready to collaborate? <Rocket size={28} strokeWidth={2} className="inline ml-1" />
                         </h2>
-                        <p className="text-lg text-gray-700 font-medium mb-8 max-w-xl mx-auto">
+                        <p className="text-lg text-gray-700 dark:text-gray-400 font-medium mb-8 max-w-xl mx-auto">
                             Sign up for free and start sketching with your team in seconds.
                         </p>
                         <button
                             onClick={() => { setAuthMode('signup'); document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                            className="px-10 py-4 bg-purple-300 hover:bg-purple-400 border-2 border-black rounded-xl font-bold text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black inline-flex items-center gap-2 -rotate-1"
+                            className="px-10 py-4 bg-purple-300 dark:bg-purple-700 hover:bg-purple-400 dark:hover:bg-purple-800 border-2 border-black dark:border-gray-600 rounded-xl font-bold text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black dark:text-white inline-flex items-center gap-2 -rotate-1"
                         >
                             Get Started Free <ChevronRight size={20} strokeWidth={2.5} />
                         </button>
@@ -325,20 +360,20 @@ export default function Landing() {
                 {/* ═══════════════════════════════════ */}
                 {/* ─── FOOTER ─── */}
                 {/* ═══════════════════════════════════ */}
-                <footer className="border-t-2 border-black border-dashed py-10">
+                <footer className="border-t-2 border-black dark:border-gray-700 border-dashed py-10">
                     <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-2">
-                            <div className="bg-yellow-300 border-2 border-black p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-3">
+                            <div className="bg-yellow-300 dark:bg-yellow-500 border-2 border-black dark:border-gray-700 p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] -rotate-3">
                                 <Pencil size={14} strokeWidth={2.5} />
                             </div>
-                            <span className="text-lg font-extrabold text-black rotate-[0.5deg]">SyncSpace © 2026</span>
+                            <span className="text-lg font-extrabold text-black dark:text-white rotate-[0.5deg]">SyncSpace © 2026</span>
                         </div>
-                        <div className="flex gap-6 text-sm font-bold text-gray-600">
-                            <a href="#" className="hover:text-black hover:underline decoration-2 underline-offset-4 transition-colors">Documentation</a>
-                            <a href="#" className="hover:text-black hover:underline decoration-2 underline-offset-4 transition-colors">GitHub</a>
-                            <a href="#" className="hover:text-black hover:underline decoration-2 underline-offset-4 transition-colors">About</a>
+                        <div className="flex gap-6 text-sm font-bold text-gray-600 dark:text-gray-400">
+                            <a href="#" className="hover:text-black dark:hover:text-white hover:underline decoration-2 underline-offset-4 transition-colors">Documentation</a>
+                            <a href="#" className="hover:text-black dark:hover:text-white hover:underline decoration-2 underline-offset-4 transition-colors">GitHub</a>
+                            <a href="#" className="hover:text-black dark:hover:text-white hover:underline decoration-2 underline-offset-4 transition-colors">About</a>
                         </div>
-                        <p className="text-xs text-gray-500 font-medium">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                             Built with React, Tailwind, Socket.io & <Heart size={14} strokeWidth={2.5} className="inline text-red-500 fill-red-500" />
                         </p>
                     </div>

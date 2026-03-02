@@ -19,9 +19,14 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Password is required'],
         minlength: 6,
         select: false // Don't return password by default in queries
+        // Not required — Google users won't have a password
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true // allows multiple docs with null googleId
     },
     avatar: {
         type: String,
@@ -33,13 +38,14 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving (Mongoose 9: async hooks don't receive 'next')
 userSchema.pre('save', async function () {
-    if (!this.isModified('password')) return;
+    if (!this.isModified('password') || !this.password) return;
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare entered password with hashed password in DB
 userSchema.methods.comparePassword = async function (candidatePassword) {
+    if (!this.password) return false; // Google-only users have no password
     return bcrypt.compare(candidatePassword, this.password);
 };
 

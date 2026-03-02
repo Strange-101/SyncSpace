@@ -55,8 +55,8 @@ export const VideoGrid = ({ userVideo, peers, viewMode, peerNames = {}, userName
         : 'absolute top-20 right-4 flex flex-col gap-4 w-64 pointer-events-none z-50';
 
     const videoBoxClasses = isGallery
-        ? 'relative w-full h-full rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 pointer-events-auto'
-        : 'relative aspect-video w-full rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 pointer-events-auto shrink-0 transition-all duration-300';
+        ? 'relative w-full h-full rounded-xl border-2 border-black dark:border-gray-600 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 pointer-events-auto'
+        : 'relative aspect-video w-full rounded-xl border-2 border-black dark:border-gray-600 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 pointer-events-auto shrink-0 transition-all duration-300';
 
     // In gallery mode, we ignore the collapsed state
     const shouldCollapse = !isGallery && isCollapsed;
@@ -68,7 +68,7 @@ export const VideoGrid = ({ userVideo, peers, viewMode, peerNames = {}, userName
                 <div className="flex justify-end pointer-events-auto mb-[-8px]">
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="bg-white border-2 border-black text-black p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1 transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] z-10"
+                        className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 text-black dark:text-white p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1 transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] z-10"
                         title={isCollapsed ? "Expand Videos" : "Collapse Videos"}
                     >
                         {isCollapsed ? <ChevronDown size={16} strokeWidth={2.5} /> : <ChevronUp size={16} strokeWidth={2.5} />}

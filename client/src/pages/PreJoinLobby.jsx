@@ -153,14 +153,14 @@ export default function PreJoinLobby() {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdfdfd] font-sans selection:bg-yellow-200 flex flex-col items-center justify-center p-6 overflow-hidden relative">
+        <div className="min-h-screen bg-[#fdfdfd] dark:bg-[#0a0a0f] font-sans selection:bg-yellow-200 dark:selection:bg-yellow-800 flex flex-col items-center justify-center p-6 overflow-hidden relative transition-colors duration-300">
 
             {/* Background doodles */}
             <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div className="absolute top-16 left-8 -rotate-12 opacity-[0.06]"><Video size={64} strokeWidth={1.5} /></div>
-                <div className="absolute bottom-20 right-16 rotate-12 opacity-[0.06]"><Mic size={52} strokeWidth={1.5} /></div>
-                <div className="absolute top-1/3 right-8 rotate-45 opacity-[0.05]"><Zap size={44} strokeWidth={1.5} /></div>
-                <div className="absolute bottom-1/3 left-12 -rotate-6 opacity-[0.05]"><Sparkles size={52} strokeWidth={1.5} /></div>
+                <div className="absolute top-16 left-8 -rotate-12 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><Video size={64} strokeWidth={1.5} /></div>
+                <div className="absolute bottom-20 right-16 rotate-12 opacity-[0.06] dark:opacity-[0.15] dark:text-white"><Mic size={52} strokeWidth={1.5} /></div>
+                <div className="absolute top-1/3 right-8 rotate-45 opacity-[0.05] dark:opacity-[0.1] dark:text-white"><Zap size={44} strokeWidth={1.5} /></div>
+                <div className="absolute bottom-1/3 left-12 -rotate-6 opacity-[0.05] dark:opacity-[0.1] dark:text-white"><Sparkles size={52} strokeWidth={1.5} /></div>
             </div>
 
             {/* Main Lobby Card */}
@@ -168,20 +168,20 @@ export default function PreJoinLobby() {
 
                 {/* Header */}
                 <div className="flex items-center justify-center gap-3 mb-8">
-                    <div className="bg-yellow-300 border-2 border-black p-2.5 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-3">
+                    <div className="bg-yellow-300 dark:bg-yellow-500 border-2 border-black dark:border-gray-700 p-2.5 rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -rotate-3">
                         <Pencil size={24} strokeWidth={2.5} />
                     </div>
-                    <h1 className="text-3xl font-extrabold text-black tracking-tight">SyncSpace</h1>
+                    <h1 className="text-3xl font-extrabold text-black dark:text-white tracking-tight">SyncSpace</h1>
                 </div>
 
-                <div className="bg-white border-2 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 rotate-[0.3deg] hover:rotate-0 transition-transform">
+                <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(55,65,81,1)] p-6 rotate-[0.3deg] hover:rotate-0 transition-transform">
 
                     {/* Room Info */}
                     <div className="flex items-center justify-between mb-5">
-                        <h2 className="text-xl font-extrabold text-black tracking-tight flex items-center gap-2"><DoorOpen size={22} strokeWidth={2.5} /> Joining Room</h2>
+                        <h2 className="text-xl font-extrabold text-black dark:text-white tracking-tight flex items-center gap-2"><DoorOpen size={22} strokeWidth={2.5} /> Joining Room</h2>
                         <button
                             onClick={copyRoomId}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-purple-200 border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all text-sm font-bold"
+                            className="flex items-center gap-2 px-3 py-1.5 bg-purple-200 dark:bg-purple-800 border-2 border-black dark:border-gray-600 rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all text-sm font-bold text-black dark:text-white"
                         >
                             {copied ? <CheckCircle2 size={14} strokeWidth={2.5} /> : <Copy size={14} strokeWidth={2.5} />}
                             {copied ? 'Copied!' : 'Copy ID'}
@@ -189,7 +189,7 @@ export default function PreJoinLobby() {
                     </div>
 
                     {/* Camera Preview — always mount video, hide with CSS */}
-                    <div className="relative w-full aspect-video rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 mb-5">
+                    <div className="relative w-full aspect-video rounded-xl border-2 border-black dark:border-gray-600 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-gray-900 mb-5">
                         {/* Video element always in DOM, hidden when camera off */}
                         <video
                             ref={videoRef}
@@ -201,8 +201,8 @@ export default function PreJoinLobby() {
                         {/* Camera-off placeholder */}
                         {!isVideoOn && (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                                <div className="w-20 h-20 rounded-2xl bg-blue-300 border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                                    <span className="text-3xl font-extrabold text-black">{userName.charAt(0).toUpperCase()}</span>
+                                <div className="w-20 h-20 rounded-2xl bg-blue-300 dark:bg-blue-700 border-2 border-black dark:border-gray-600 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                                    <span className="text-3xl font-extrabold text-black dark:text-white">{userName.charAt(0).toUpperCase()}</span>
                                 </div>
                                 <span className="text-white/60 font-bold text-sm">Camera is off</span>
                             </div>
@@ -217,14 +217,14 @@ export default function PreJoinLobby() {
                     <div className="flex items-center justify-center gap-4 mb-6">
                         <button
                             onClick={toggleAudio}
-                            className={`flex items-center gap-2 px-5 py-3 border-2 border-black rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all ${isAudioOn ? 'bg-green-200' : 'bg-red-200'}`}
+                            className={`flex items-center gap-2 px-5 py-3 border-2 border-black dark:border-gray-600 rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black dark:text-white ${isAudioOn ? 'bg-green-200 dark:bg-green-800' : 'bg-red-200 dark:bg-red-900'}`}
                         >
                             {isAudioOn ? <Mic size={20} strokeWidth={2.5} /> : <MicOff size={20} strokeWidth={2.5} />}
                             {isAudioOn ? 'Mic On' : 'Mic Off'}
                         </button>
                         <button
                             onClick={toggleVideo}
-                            className={`flex items-center gap-2 px-5 py-3 border-2 border-black rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all ${isVideoOn ? 'bg-green-200' : 'bg-red-200'}`}
+                            className={`flex items-center gap-2 px-5 py-3 border-2 border-black dark:border-gray-600 rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all text-black dark:text-white ${isVideoOn ? 'bg-green-200 dark:bg-green-800' : 'bg-red-200 dark:bg-red-900'}`}
                         >
                             {isVideoOn ? <Video size={20} strokeWidth={2.5} /> : <VideoOff size={20} strokeWidth={2.5} />}
                             {isVideoOn ? 'Camera On' : 'Camera Off'}
@@ -232,20 +232,20 @@ export default function PreJoinLobby() {
                     </div>
 
                     {/* Dashed divider */}
-                    <div className="w-full border-t-2 border-black border-dashed my-5"></div>
+                    <div className="w-full border-t-2 border-black dark:border-gray-600 border-dashed my-5"></div>
 
                     {/* Status-Dependent UI */}
                     {lobbyStatus === 'loading' && (
                         <div className="flex items-center justify-center gap-3 py-4">
-                            <Loader2 size={20} className="animate-spin" strokeWidth={2.5} />
-                            <span className="font-bold text-gray-600">Checking room...</span>
+                            <Loader2 size={20} className="animate-spin text-black dark:text-white" strokeWidth={2.5} />
+                            <span className="font-bold text-gray-600 dark:text-gray-400">Checking room...</span>
                         </div>
                     )}
 
                     {lobbyStatus === 'ready' && (
                         <button
                             onClick={handleJoin}
-                            className="w-full bg-blue-400 hover:bg-blue-500 text-black font-bold text-lg py-4 px-6 border-2 border-black rounded-xl flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
+                            className="w-full bg-blue-400 dark:bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 text-black dark:text-white font-bold text-lg py-4 px-6 border-2 border-black dark:border-gray-600 rounded-xl flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(55,65,81,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all"
                         >
                             <ArrowRight size={22} strokeWidth={2.5} />
                             <Rocket size={18} strokeWidth={2.5} /> Join Workspace
@@ -254,26 +254,26 @@ export default function PreJoinLobby() {
 
                     {lobbyStatus === 'waiting' && (
                         <div className="flex flex-col items-center gap-4 py-4">
-                            <div className="bg-yellow-200 border-2 border-black rounded-xl px-6 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 -rotate-[0.5deg]">
-                                <Clock size={22} strokeWidth={2.5} className="animate-pulse" />
+                            <div className="bg-yellow-200 dark:bg-yellow-800/60 border-2 border-black dark:border-gray-600 rounded-xl px-6 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3 -rotate-[0.5deg]">
+                                <Clock size={22} strokeWidth={2.5} className="animate-pulse text-black dark:text-white" />
                                 <div>
-                                    <p className="font-extrabold text-black text-base">Waiting for host to let you in...</p>
-                                    {hostName && <p className="text-sm font-bold text-gray-700">Host: {hostName}</p>}
+                                    <p className="font-extrabold text-black dark:text-white text-base">Waiting for host to let you in...</p>
+                                    {hostName && <p className="text-sm font-bold text-gray-700 dark:text-gray-400">Host: {hostName}</p>}
                                 </div>
                             </div>
-                            <p className="text-sm text-gray-500 font-medium">You'll be redirected automatically once approved</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">You'll be redirected automatically once approved</p>
                         </div>
                     )}
 
                     {lobbyStatus === 'denied' && (
                         <div className="flex flex-col items-center gap-4 py-4">
-                            <div className="bg-red-200 border-2 border-black rounded-xl px-6 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3">
-                                <UserX size={22} strokeWidth={2.5} />
-                                <p className="font-extrabold text-black">The host declined your request</p>
+                            <div className="bg-red-200 dark:bg-red-900/60 border-2 border-black dark:border-gray-600 rounded-xl px-6 py-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center gap-3">
+                                <UserX size={22} strokeWidth={2.5} className="text-black dark:text-white" />
+                                <p className="font-extrabold text-black dark:text-white">The host declined your request</p>
                             </div>
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="px-6 py-3 bg-white border-2 border-black rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                                className="px-6 py-3 bg-white dark:bg-gray-700 border-2 border-black dark:border-gray-600 rounded-xl font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-black dark:text-white"
                             >
                                 ← Back to Dashboard
                             </button>
@@ -283,25 +283,25 @@ export default function PreJoinLobby() {
 
                 {/* Join Requests (visible to host who is still on this page) */}
                 {joinRequests.length > 0 && (
-                    <div className="mt-6 bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-5">
-                        <h3 className="font-extrabold text-black mb-3 flex items-center gap-2">
+                    <div className="mt-6 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(55,65,81,1)] p-5">
+                        <h3 className="font-extrabold text-black dark:text-white mb-3 flex items-center gap-2">
                             <ShieldCheck size={18} strokeWidth={2.5} />
                             People waiting ({joinRequests.length})
                         </h3>
                         <div className="space-y-3">
                             {joinRequests.map((req) => (
-                                <div key={req.socketId} className="flex items-center justify-between p-3 bg-yellow-100 border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                                    <span className="font-bold text-black flex items-center gap-1.5"><User size={14} strokeWidth={2.5} /> {req.userName}</span>
+                                <div key={req.socketId} className="flex items-center justify-between p-3 bg-yellow-100 dark:bg-yellow-900/40 border-2 border-black dark:border-gray-600 rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                    <span className="font-bold text-black dark:text-white flex items-center gap-1.5"><User size={14} strokeWidth={2.5} /> {req.userName}</span>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => admitUser(req.socketId)}
-                                            className="px-3 py-1.5 bg-green-300 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-1"
+                                            className="px-3 py-1.5 bg-green-300 dark:bg-green-700 border-2 border-black dark:border-gray-600 rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-1 text-black dark:text-white"
                                         >
                                             <UserCheck size={14} strokeWidth={2.5} /> Admit
                                         </button>
                                         <button
                                             onClick={() => denyUser(req.socketId)}
-                                            className="px-3 py-1.5 bg-red-200 border-2 border-black rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-1"
+                                            className="px-3 py-1.5 bg-red-200 dark:bg-red-900 border-2 border-black dark:border-gray-600 rounded-lg font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-1 text-black dark:text-white"
                                         >
                                             <UserX size={14} strokeWidth={2.5} /> Deny
                                         </button>

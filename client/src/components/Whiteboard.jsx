@@ -4,6 +4,18 @@ import { Excalidraw } from '@excalidraw/excalidraw';
 const Whiteboard = ({ socket, roomId }) => {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   const isUpdatingRef = useRef(false);
+  const [theme, setTheme] = useState(
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  );
+
+  // Listen for dark mode class changes on <html>
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!socket || !roomId || !excalidrawAPI) return;
@@ -35,6 +47,7 @@ const Whiteboard = ({ socket, roomId }) => {
       <Excalidraw
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
         onChange={onChange}
+        theme={theme}
         UIOptions={{
           canvasActions: {
             loadScene: false,

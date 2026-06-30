@@ -21,3 +21,6 @@ jobs:
 
       - name: Build frontend production Docker image
         run: docker build -f client/Dockerfile.prod -t syncspace-frontend ./client
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config

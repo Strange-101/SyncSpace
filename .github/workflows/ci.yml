@@ -1,0 +1,23 @@
+name: SyncSpace CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t syncspace-backend ./server
+
+      - name: Build frontend production Docker image
+        run: docker build -f client/Dockerfile.prod -t syncspace-frontend ./client

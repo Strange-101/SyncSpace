@@ -1,53 +1,67 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const { DataTypes } = require("sequelize");
+const bcrypt = require("bcryptjs");
+const sequelize = require("../db");
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define(
+  "User",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     name: {
-        type: String,
-        required: [true, 'Name is required'],
-        trim: true,
-        minlength: 2,
-        maxlength: 50
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      validate: {
+        len: { args: [2, 50], msg: "Name must be between 2 and 50 characters" },
+        notEmpty: { msg: "Name is required" },
+      },
     },
     email: {
-        type: String,
-        required: [true, 'Email is required'],
-        unique: true,
-        trim: true,
-        lowercase: true,
-        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: { msg: "Please enter a valid email" },
+        notEmpty: { msg: "Email is required" },
+      },
     },
     password: {
-        type: String,
-        minlength: 6,
-        select: false // Don't return password by default in queries
-        // Not required — Google users won't have a password
+      type: DataTypes.STRING,
+      allowNull: true,
+      // Not required — Google users won't have a password
     },
     googleId: {
-        type: String,
-        unique: true,
-        sparse: true // allows multiple docs with null googleId
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+      // PostgreSQL unique indexes allow multiple NULLs, so no sparse workaround needed
     },
     avatar: {
-        type: String,
-        default: '' // Optional profile picture URL
-    }
-}, {
-    timestamps: true // Adds createdAt and updatedAt
-});
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "",
+    },
+  },
+  {
+    timestamps: true, // adds createdAt and updatedAt
+    tableName: "users",
+  },
+);
 
-// Hash password before saving (Mongoose 9: async hooks don't receive 'next')
-userSchema.pre('save', async function () {
-    if (!this.isModified('password') || !this.password) return;
+// Hash password before creating or updating (only when password field changed)
+User.beforeSave(async (user) => {
+  if (user.changed("password") && user.password) {
     const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+    user.password = await bcrypt.hash(user.password, salt);
+  }
 });
 
 // Compare entered password with hashed password in DB
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    if (!this.password) return false; // Google-only users have no password
-    return bcrypt.compare(candidatePassword, this.password);
+User.prototype.comparePassword = async function (candidatePassword) {
+  if (!this.password) return false; // Google-only users have no password
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
-
+module.exports = User;

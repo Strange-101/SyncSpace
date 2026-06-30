@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: syncspace
+      POSTGRES_USER: syncspace
+      POSTGRES_PASSWORD: syncspace
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U syncspace -d syncspace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./server
+    ports:
+      - "5001:5001"
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./client
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

@@ -22,5 +22,15 @@ jobs:
       - name: Build frontend production Docker image
         run: docker build -f client/Dockerfile.prod -t syncspace-frontend ./client
 
+      - name: Create backend .env
+        run: |
+          cat > server/.env <<EOF
+          PORT=5001
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          DB_SSL=false
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          EOF
+
       - name: Validate Docker Compose configuration
         run: docker compose config

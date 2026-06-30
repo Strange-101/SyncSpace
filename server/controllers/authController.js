@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
+const logger = require("../logger").child({ module: "authController" });
+const { loginCounter, signupCounter } = require("../metrics");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -45,6 +47,7 @@ const register = async (req, res) => {
     // Generate token and respond
     const token = generateToken(user.id);
 
+    signupCounter.inc();
     res.status(201).json({
       _id: user.id,
       name: user.name,
@@ -53,13 +56,11 @@ const register = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Register error:", error);
-    res
-      .status(500)
-      .json({
-        message: "Server error during registration",
-        error: error.message,
-      });
+    logger.error({ err: error }, "Register error");
+    res.status(500).json({
+      message: "Server error during registration",
+      error: error.message,
+    });
   }
 };
 
@@ -92,6 +93,7 @@ const login = async (req, res) => {
     // Generate token and respond
     const token = generateToken(user.id);
 
+    loginCounter.inc();
     res.json({
       _id: user.id,
       name: user.name,
@@ -100,7 +102,7 @@ const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error({ err: error }, "Login error");
     res
       .status(500)
       .json({ message: "Server error during login", error: error.message });
@@ -176,6 +178,7 @@ const googleLogin = async (req, res) => {
 
     // Generate token and respond
     const token = generateToken(user.id);
+    loginCounter.inc();
 
     res.json({
       _id: user.id,
@@ -185,7 +188,7 @@ const googleLogin = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Google login error:", error);
+    logger.error({ err: error }, "Google login error");
     res
       .status(500)
       .json({ message: "Google authentication failed", error: error.message });
@@ -212,7 +215,7 @@ const getMe = async (req, res) => {
       avatar: user.avatar,
     });
   } catch (error) {
-    console.error("GetMe error:", error.message);
+    logger.error({ err: error }, "GetMe error");
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -249,7 +252,7 @@ const updateProfile = async (req, res) => {
       avatar: user.avatar,
     });
   } catch (error) {
-    console.error("UpdateProfile error:", error.message);
+    logger.error({ err: error }, "UpdateProfile error");
     res.status(500).json({ message: "Server error updating profile" });
   }
 };
@@ -293,7 +296,7 @@ const changePassword = async (req, res) => {
 
     res.json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("ChangePassword error:", error.message);
+    logger.error({ err: error }, "ChangePassword error");
     res.status(500).json({ message: "Server error changing password" });
   }
 };

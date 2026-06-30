@@ -37,3 +37,6 @@ jobs:
 
       - name: Start application stack
         run: docker compose up -d
+
+      - name: Show running containers
+        run: docker compose ps

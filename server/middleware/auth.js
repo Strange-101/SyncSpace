@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const logger = require("../logger").child({ module: "auth" });
 
 const protect = async (req, res, next) => {
   let token;
@@ -35,7 +36,7 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Auth middleware error:", error.message);
+    logger.error({ err: error }, "Auth middleware error");
     return res.status(401).json({ message: "Not authorized, token invalid" });
   }
 };

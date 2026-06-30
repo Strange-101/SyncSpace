@@ -4,12 +4,23 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const sequelize = require("./db");
-require("./models/User"); // ensure model is registered with Sequelize
+const logger = require("./logger");
+const pinoHttp = require("pino-http");
+const metricsRoutes = require("./routes/metricsRoutes");
+const { activeUsers } = require("./metrics");
+
+require("./models/User");
 
 // Load Environment Variables
 dotenv.config();
 
 const app = express();
+app.use(
+  pinoHttp({
+    logger,
+    autoLogging: true,
+  }),
+);
 const server = http.createServer(app);
 
 // CORS origins — configurable via env
@@ -30,6 +41,12 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
+const healthRoutes = require("./routes/healthRoutes");
+app.use("/health", healthRoutes);
+
+// ---Monitering
+app.use("/metrics", metricsRoutes);
+
 // Socket.io Setup
 const io = new Server(server, {
   cors: {
@@ -37,6 +54,11 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+
+// ─── Child loggers by context ───
+const lobbyLog = logger.child({ context: "Lobby" });
+const roomLog = logger.child({ context: "Room" });
+const signalLog = logger.child({ context: "Signal" });
 
 // ─── State Tracking ───
 const userNames = new Map(); // socketId → userName
@@ -53,8 +75,9 @@ function getActiveHost(roomId) {
   if (roomMembers && roomMembers.size > 0) {
     const newHost = Array.from(roomMembers)[0];
     roomHosts.set(roomId, newHost);
-    console.log(
-      `[Lobby] Auto-promoted ${userNames.get(newHost) || newHost} as host of ${roomId}`,
+    lobbyLog.info(
+      { roomId, newHost: userNames.get(newHost) || newHost },
+      "Auto-promoted new host",
     );
     return newHost;
   }
@@ -63,7 +86,8 @@ function getActiveHost(roomId) {
 }
 
 io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
+  activeUsers.inc();
+  logger.info({ socketId: socket.id }, "User connected");
 
   // ─── Lobby: Check Room Status ───
   socket.on("check_room", ({ roomId }) => {
@@ -88,8 +112,9 @@ io.on("connection", (socket) => {
 
     if (memberCount === 0 && !activeHost) {
       // No one in the room — this user is the first one, auto-admit
-      console.log(
-        `[Lobby] ${userName} auto-admitted as first user (will become host on join_room)`,
+      lobbyLog.info(
+        { roomId, userName },
+        "Auto-admitted as first user (will become host)",
       );
       socket.emit("join_approved");
     } else if (activeHost) {
@@ -100,13 +125,13 @@ io.on("connection", (socket) => {
         queue.push({ socketId: socket.id, userName });
         waitingRoom.set(roomId, queue);
       }
-      console.log(`[Lobby] ${userName} waiting for approval in room ${roomId}`);
+      lobbyLog.info({ roomId, userName }, "User waiting for approval");
       socket.emit("join_waiting");
       // Notify host (who might be in the workspace)
       io.to(activeHost).emit("join_request", { socketId: socket.id, userName });
     } else {
       // Edge case: room has members but no host — auto-admit
-      console.log(`[Lobby] ${userName} auto-admitted (no active host)`);
+      lobbyLog.info({ roomId, userName }, "Auto-admitted (no active host)");
       socket.emit("join_approved");
     }
   });
@@ -115,7 +140,10 @@ io.on("connection", (socket) => {
   socket.on("admit_user", ({ roomId, targetSocketId }) => {
     const activeHost = getActiveHost(roomId);
     if (activeHost !== socket.id) {
-      console.log(`[Lobby] Non-host ${socket.id} tried to admit — denied`);
+      lobbyLog.warn(
+        { roomId, socketId: socket.id },
+        "Non-host tried to admit — denied",
+      );
       return;
     }
     const queue = waitingRoom.get(roomId) || [];
@@ -124,8 +152,9 @@ io.on("connection", (socket) => {
       queue.filter((u) => u.socketId !== targetSocketId),
     );
     io.to(targetSocketId).emit("join_approved");
-    console.log(
-      `[Lobby] Host admitted ${userNames.get(targetSocketId) || targetSocketId} to room ${roomId}`,
+    lobbyLog.info(
+      { roomId, admitted: userNames.get(targetSocketId) || targetSocketId },
+      "Host admitted user",
     );
   });
 
@@ -138,8 +167,9 @@ io.on("connection", (socket) => {
       queue.filter((u) => u.socketId !== targetSocketId),
     );
     io.to(targetSocketId).emit("join_denied");
-    console.log(
-      `[Lobby] Host denied ${userNames.get(targetSocketId) || targetSocketId} from room ${roomId}`,
+    lobbyLog.info(
+      { roomId, denied: userNames.get(targetSocketId) || targetSocketId },
+      "Host denied user",
     );
   });
 
@@ -153,13 +183,16 @@ io.on("connection", (socket) => {
     }
 
     socket.join(roomId);
-    console.log(`[Room] ${userName || socket.id} joined room: ${roomId}`);
+    roomLog.info(
+      { roomId, userName: userName || socket.id },
+      "User joined room",
+    );
 
     // If no host yet, this user becomes the host
     const activeHost = getActiveHost(roomId);
     if (!activeHost) {
       roomHosts.set(roomId, socket.id);
-      console.log(`[Room] ${userName || socket.id} is now host of ${roomId}`);
+      roomLog.info({ roomId, host: userName || socket.id }, "User became host");
     }
 
     // Notify others in the room (include name)
@@ -189,7 +222,7 @@ io.on("connection", (socket) => {
 
   // WebRTC Signaling
   socket.on("offer", (payload) => {
-    console.log(`[Signal] Offer from ${socket.id} → ${payload.target}`);
+    signalLog.info({ from: socket.id, to: payload.target }, "Offer");
     io.to(payload.target).emit("offer", {
       caller: socket.id,
       signal: payload.signal,
@@ -197,7 +230,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer", (payload) => {
-    console.log(`[Signal] Answer from ${socket.id} → ${payload.caller}`);
+    signalLog.info({ from: socket.id, to: payload.caller }, "Answer");
     io.to(payload.caller).emit("answer", {
       id: socket.id,
       signal: payload.signal,
@@ -250,8 +283,12 @@ io.on("connection", (socket) => {
             );
             if (remaining.length > 0) {
               roomHosts.set(roomId, remaining[0]);
-              console.log(
-                `[Room] New host for ${roomId}: ${userNames.get(remaining[0]) || remaining[0]}`,
+              roomLog.info(
+                {
+                  roomId,
+                  newHost: userNames.get(remaining[0]) || remaining[0],
+                },
+                "New host promoted",
               );
             } else {
               roomHosts.delete(roomId);
@@ -274,7 +311,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`User Disconnected: ${socket.id}`);
+    activeUsers.dec();
+
+    logger.info({ socketId: socket.id }, "User disconnected");
+
     userNames.delete(socket.id);
   });
 });
@@ -287,27 +327,27 @@ if (DATABASE_URL) {
   sequelize
     .authenticate()
     .then(() => {
-      console.log("PostgreSQL connected successfully");
+      logger.info("PostgreSQL connected successfully");
       return sequelize.sync(); // creates tables if they don't exist
     })
     .then(() => {
       server.listen(PORT, () => {
-        console.log(`Server listening on port ${PORT}`);
+        logger.info(`Server listening on port ${PORT}`);
       });
     })
     .catch((err) => {
-      console.error("❌ PostgreSQL connection error:", err.message);
+      logger.error({ err }, "PostgreSQL connection error");
       server.listen(PORT, () => {
-        console.log(
+        logger.info(
           `Server listening on port ${PORT} (no database - auth will NOT work)`,
         );
       });
     });
 } else {
-  console.warn(
-    "⚠️  DATABASE_URL not configured. Auth routes will NOT work. Set DATABASE_URL in .env",
+  logger.warn(
+    "DATABASE_URL not configured — auth routes will NOT work. Set DATABASE_URL in .env",
   );
   server.listen(PORT, () => {
-    console.log(`This Server listening on port ${PORT} (no database)`);
+    logger.info(`This Server listening on port ${PORT} (no database)`);
   });
 }

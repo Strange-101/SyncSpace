@@ -34,3 +34,6 @@ jobs:
 
       - name: Validate Docker Compose configuration
         run: docker compose config
+
+      - name: Start application stack
+        run: docker compose up -d

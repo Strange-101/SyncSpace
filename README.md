@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 7" />
 </p>
 
-<h1 align="center">🖊️ SyncSpace</h1>
+<h1 align="center">SyncSpace</h1>
 <p align="center"><strong>Real-time collaborative whiteboard with video calling, lobby management, and production-grade infrastructure</strong></p>
 
 ---
